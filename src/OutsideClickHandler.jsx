@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { forbidExtraProps } from 'airbnb-prop-types';
 import { addEventListener } from 'consolidated-events';
 
 import contains from 'document.contains';
@@ -13,40 +12,29 @@ const DISPLAY = {
   INLINE_BLOCK: 'inline-block',
   CONTENTS: 'contents',
 };
-
-// NOTE: Of course, using a `for..in` loop as a way to determine `Object.values`
-// doesn't work for every scenario. However, since we are merely creating a plain
-// object here without weird `getters` and such, we can use this to help with
-// verifying propTypes. Doing this rather than using an polyfill'd version of the
-// real `Object.values` (such as the 'object.values' lib) reduces our bundle by a
-// fair amount, which is enough to justify the (sometimes problematic) `for..in` here.
 const pseudoObjectValues = (obj) => {
   const objValues = [];
-  /* eslint-disable no-restricted-syntax */
   for (const val in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, val)) {
       objValues.push(obj[val]);
     }
   }
-  /* eslint-enable no-restricted-syntax */
-
   return objValues;
 };
 const DISPLAY_VALUES = pseudoObjectValues(DISPLAY);
 
-const propTypes = forbidExtraProps({
+const propTypes = {
   children: PropTypes.node.isRequired,
   onOutsideClick: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   useCapture: PropTypes.bool,
   display: PropTypes.oneOf(DISPLAY_VALUES),
-});
+  className: PropTypes.string,
+  onClick: PropTypes.func,
+};
 
 const defaultProps = {
   disabled: false,
-
-  // `useCapture` is set to true by default so that a `stopPropagation` in the
-  // children will not prevent all outside click handlers from firing - maja
   useCapture: true,
   display: DISPLAY.BLOCK,
 };
@@ -79,10 +67,6 @@ export default class OutsideClickHandler extends React.Component {
   componentWillUnmount() {
     this.removeEventListeners();
   }
-
-  // Use mousedown/mouseup to enforce that clicks remain outside the root's
-  // descendant tree, even when dragged. This should also get triggered on
-  // touch devices.
   onMouseDown(e) {
     const { useCapture } = this.props;
 
@@ -100,10 +84,6 @@ export default class OutsideClickHandler extends React.Component {
       );
     }
   }
-
-  // Use mousedown/mouseup to enforce that clicks remain outside the root's
-  // descendant tree, even when dragged. This should also get triggered on
-  // touch devices.
   onMouseUp(e) {
     const { onOutsideClick } = this.props;
 
@@ -138,7 +118,6 @@ export default class OutsideClickHandler extends React.Component {
 
   render() {
     const { children, display } = this.props;
-
     return (
       <div
         ref={this.setChildNodeRef}
@@ -147,6 +126,8 @@ export default class OutsideClickHandler extends React.Component {
             ? { display }
             : undefined
         }
+        className={this.props.className}
+        onClick={this.props.onClick}
       >
         {children}
       </div>

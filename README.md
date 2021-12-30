@@ -7,7 +7,7 @@ A React component wrapper for handling outside clicks.
 ## Usage
 
 ```jsx
-import OutsideClickHandler from 'react-outside-click-handler-lite';
+import OutsideClickHandler from 'react-outside-click-wrapper';
 
 function MyComponent() {
   return (
@@ -15,6 +15,8 @@ function MyComponent() {
       onOutsideClick={() => {
         alert('You clicked outside of this component!!!');
       }}
+      className="my-class"
+      onClick={() => doThat()}
     >
       Hello World
     </OutsideClickHandler>

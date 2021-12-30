@@ -14,15 +14,13 @@ var _propTypes = require('prop-types');
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _airbnbPropTypes = require('airbnb-prop-types');
-
 var _consolidatedEvents = require('consolidated-events');
 
 var _document = require('document.contains');
 
 var _document2 = _interopRequireDefault(_document);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -37,44 +35,31 @@ var DISPLAY = {
   INLINE_BLOCK: 'inline-block',
   CONTENTS: 'contents'
 };
-
-// NOTE: Of course, using a `for..in` loop as a way to determine `Object.values`
-// doesn't work for every scenario. However, since we are merely creating a plain
-// object here without weird `getters` and such, we can use this to help with
-// verifying propTypes. Doing this rather than using an polyfill'd version of the
-// real `Object.values` (such as the 'object.values' lib) reduces our bundle by a
-// fair amount, which is enough to justify the (sometimes problematic) `for..in` here.
 var pseudoObjectValues = function pseudoObjectValues(obj) {
   var objValues = [];
-  /* eslint-disable no-restricted-syntax */
   for (var val in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, val)) {
       objValues.push(obj[val]);
     }
   }
-  /* eslint-enable no-restricted-syntax */
-
   return objValues;
 };
 var DISPLAY_VALUES = pseudoObjectValues(DISPLAY);
 
-var propTypes = (0, _airbnbPropTypes.forbidExtraProps)({
-  children: _propTypes2['default'].node.isRequired,
-  onOutsideClick: _propTypes2['default'].func.isRequired,
-  disabled: _propTypes2['default'].bool,
-  useCapture: _propTypes2['default'].bool,
-  display: _propTypes2['default'].oneOf(DISPLAY_VALUES),
-  className: _propTypes2['default'].string
-});
+var propTypes = {
+  children: _propTypes2.default.node.isRequired,
+  onOutsideClick: _propTypes2.default.func.isRequired,
+  disabled: _propTypes2.default.bool,
+  useCapture: _propTypes2.default.bool,
+  display: _propTypes2.default.oneOf(DISPLAY_VALUES),
+  className: _propTypes2.default.string,
+  onClick: _propTypes2.default.func
+};
 
 var defaultProps = {
   disabled: false,
-
-  // `useCapture` is set to true by default so that a `stopPropagation` in the
-  // children will not prevent all outside click handlers from firing - maja
   useCapture: true,
-  display: DISPLAY.BLOCK,
-  className: ''
+  display: DISPLAY.BLOCK
 };
 
 var OutsideClickHandler = function (_React$Component) {
@@ -99,153 +84,106 @@ var OutsideClickHandler = function (_React$Component) {
 
   _createClass(OutsideClickHandler, [{
     key: 'componentDidMount',
-    value: function () {
-      function componentDidMount() {
-        console.log('componentDidMount', this.props);
-        var _props = this.props,
-            disabled = _props.disabled,
-            useCapture = _props.useCapture;
+    value: function componentDidMount() {
+      var _props = this.props,
+          disabled = _props.disabled,
+          useCapture = _props.useCapture;
 
 
-        if (!disabled) this.addMouseDownEventListener(useCapture);
-      }
-
-      return componentDidMount;
-    }()
+      if (!disabled) this.addMouseDownEventListener(useCapture);
+    }
   }, {
     key: 'componentDidUpdate',
-    value: function () {
-      function componentDidUpdate(_ref2) {
-        var prevDisabled = _ref2.disabled;
-        var _props2 = this.props,
-            disabled = _props2.disabled,
-            useCapture = _props2.useCapture;
+    value: function componentDidUpdate(_ref2) {
+      var prevDisabled = _ref2.disabled;
+      var _props2 = this.props,
+          disabled = _props2.disabled,
+          useCapture = _props2.useCapture;
 
-        if (prevDisabled !== disabled) {
-          if (disabled) {
-            this.removeEventListeners();
-          } else {
-            this.addMouseDownEventListener(useCapture);
-          }
+      if (prevDisabled !== disabled) {
+        if (disabled) {
+          this.removeEventListeners();
+        } else {
+          this.addMouseDownEventListener(useCapture);
         }
       }
-
-      return componentDidUpdate;
-    }()
+    }
   }, {
     key: 'componentWillUnmount',
-    value: function () {
-      function componentWillUnmount() {
-        this.removeEventListeners();
-      }
-
-      return componentWillUnmount;
-    }()
-
-    // Use mousedown/mouseup to enforce that clicks remain outside the root's
-    // descendant tree, even when dragged. This should also get triggered on
-    // touch devices.
-
+    value: function componentWillUnmount() {
+      this.removeEventListeners();
+    }
   }, {
     key: 'onMouseDown',
-    value: function () {
-      function onMouseDown(e) {
-        var useCapture = this.props.useCapture;
+    value: function onMouseDown(e) {
+      var useCapture = this.props.useCapture;
 
 
-        var isDescendantOfRoot = this.childNode && (0, _document2['default'])(this.childNode, e.target);
-        if (!isDescendantOfRoot) {
-          if (this.removeMouseUp) {
-            this.removeMouseUp();
-            this.removeMouseUp = null;
-          }
-          this.removeMouseUp = (0, _consolidatedEvents.addEventListener)(document, 'mouseup', this.onMouseUp, { capture: useCapture });
-        }
-      }
-
-      return onMouseDown;
-    }()
-
-    // Use mousedown/mouseup to enforce that clicks remain outside the root's
-    // descendant tree, even when dragged. This should also get triggered on
-    // touch devices.
-
-  }, {
-    key: 'onMouseUp',
-    value: function () {
-      function onMouseUp(e) {
-        var onOutsideClick = this.props.onOutsideClick;
-
-        var isDescendantOfRoot = this.childNode && (0, _document2['default'])(this.childNode, e.target);
+      var isDescendantOfRoot = this.childNode && (0, _document2.default)(this.childNode, e.target);
+      if (!isDescendantOfRoot) {
         if (this.removeMouseUp) {
           this.removeMouseUp();
           this.removeMouseUp = null;
         }
+        this.removeMouseUp = (0, _consolidatedEvents.addEventListener)(document, 'mouseup', this.onMouseUp, { capture: useCapture });
+      }
+    }
+  }, {
+    key: 'onMouseUp',
+    value: function onMouseUp(e) {
+      var onOutsideClick = this.props.onOutsideClick;
 
-        if (!isDescendantOfRoot) {
-          onOutsideClick(e);
-        }
+
+      var isDescendantOfRoot = this.childNode && (0, _document2.default)(this.childNode, e.target);
+      if (this.removeMouseUp) {
+        this.removeMouseUp();
+        this.removeMouseUp = null;
       }
 
-      return onMouseUp;
-    }()
+      if (!isDescendantOfRoot) {
+        onOutsideClick(e);
+      }
+    }
   }, {
     key: 'setChildNodeRef',
-    value: function () {
-      function setChildNodeRef(ref) {
-        this.childNode = ref;
-      }
-
-      return setChildNodeRef;
-    }()
+    value: function setChildNodeRef(ref) {
+      this.childNode = ref;
+    }
   }, {
     key: 'addMouseDownEventListener',
-    value: function () {
-      function addMouseDownEventListener(useCapture) {
-        this.removeMouseDown = (0, _consolidatedEvents.addEventListener)(document, 'mousedown', this.onMouseDown, { capture: useCapture });
-      }
-
-      return addMouseDownEventListener;
-    }()
+    value: function addMouseDownEventListener(useCapture) {
+      this.removeMouseDown = (0, _consolidatedEvents.addEventListener)(document, 'mousedown', this.onMouseDown, { capture: useCapture });
+    }
   }, {
     key: 'removeEventListeners',
-    value: function () {
-      function removeEventListeners() {
-        if (this.removeMouseDown) this.removeMouseDown();
-        if (this.removeMouseUp) this.removeMouseUp();
-      }
-
-      return removeEventListeners;
-    }()
+    value: function removeEventListeners() {
+      if (this.removeMouseDown) this.removeMouseDown();
+      if (this.removeMouseUp) this.removeMouseUp();
+    }
   }, {
     key: 'render',
-    value: function () {
-      function render() {
-        var _props3 = this.props,
-            children = _props3.children,
-            display = _props3.display,
-            className = _props3.className;
+    value: function render() {
+      var _props3 = this.props,
+          children = _props3.children,
+          display = _props3.display;
 
-
-        return _react2['default'].createElement(
-          'div',
-          {
-            ref: this.setChildNodeRef,
-            className : className,
-            style: display !== DISPLAY.BLOCK && DISPLAY_VALUES.includes(display) ? { display: display } : undefined
-          },
-          children
-        );
-      }
-
-      return render;
-    }()
+      return _react2.default.createElement(
+        'div',
+        {
+          ref: this.setChildNodeRef,
+          style: display !== DISPLAY.BLOCK && DISPLAY_VALUES.includes(display) ? { display: display } : undefined,
+          className: this.props.className,
+          onClick: this.props.onClick
+        },
+        children
+      );
+    }
   }]);
 
   return OutsideClickHandler;
-}(_react2['default'].Component);
+}(_react2.default.Component);
 
-exports['default'] = OutsideClickHandler;
+exports.default = OutsideClickHandler;
 
 
 OutsideClickHandler.propTypes = propTypes;
