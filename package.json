@@ -1,6 +1,6 @@
 {
   "name": "react-outside-click-wrapper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A React component wrapper for handling outside clicks.",
   "main": "index.js",
   "dependencies": {
@@ -17,8 +17,8 @@
     "react-dom": "^17"
   },
   "peerDependencies": {
-    "react": "^16",
-    "react-dom": "^17"
+    "react": ">=16",
+    "react-dom": ">=16"
   },
   "scripts": {
     "build": "babel src/ -d build/"
